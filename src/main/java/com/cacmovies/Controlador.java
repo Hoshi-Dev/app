@@ -122,7 +122,7 @@ public class Controlador extends HttpServlet{
             mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));
             String json = mapper.writeValueAsString(peliculas);  
-            response.setContentType("application/json"); 
+            response.setContentType("application/json; charset=UTF-8"); 
             response.getWriter().write(json); 
         } catch (SQLException e) {
             e.printStackTrace();  
