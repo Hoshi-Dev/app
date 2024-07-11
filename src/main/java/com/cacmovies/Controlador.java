@@ -228,4 +228,50 @@ public class Controlador extends HttpServlet {
             conexion.close();
         }
     }
+
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "*");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        Conexion conexion = new Conexion();
+        Connection conn = conexion.getConnection();
+
+        try {
+            String pathInfo = request.getPathInfo();
+            if (pathInfo == null || pathInfo.equals("/")) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"message\": \"ID de pelicula no proporcionado.\"}");
+                return;
+            }
+
+            String idString = pathInfo.substring(1);
+            int idPelicula = Integer.parseInt(idString);
+
+            String query = "DELETE FROM peliculas WHERE id_pelicula = ?";
+            PreparedStatement statement = conn.prepareStatement(query);
+
+            statement.setInt(1, idPelicula);
+
+            int rowsDeleted = statement.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write("{\"message\": \"Pelicula eliminada exitosamente.\"}");
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"message\": \"Pelicula no encontrada.\"}");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"message\": \"ID de pelicula inválido.\"}");
+        } finally {
+            conexion.close();
+        }
+    }
 }
